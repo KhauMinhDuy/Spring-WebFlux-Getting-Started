@@ -8,6 +8,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -40,14 +41,29 @@ public class ProductApiFunctionalApplication {
 	}
 
 	@Bean
-	RouterFunction<ServerResponse> routers(ProductHandler productHandler) {
+	RouterFunction<ServerResponse> routers(ProductHandler handler) {
+		// return RouterFunctions.route()
+		// 	.GET("/products/event", accept(TEXT_EVENT_STREAM), handler::getProductEvents)
+		// 	.GET("/products/{id}", accept(APPLICATION_JSON), handler::getProduct)
+		// 	.GET("/products", accept(APPLICATION_JSON), handler::getAllProducts)
+		// 	.PUT("/products/{id}", accept(APPLICATION_JSON), handler::updateProduct)
+		// 	.POST("/products", accept(APPLICATION_JSON), handler::saveProduct)
+		// 	.DELETE("/products/{id}", accept(APPLICATION_JSON), handler::deleteProduct)
+		// 	.DELETE("/products", accept(APPLICATION_JSON), handler::deleteAllProduct)
+		// 	.build();
+
 		return RouterFunctions.route()
-			.GET("/products/event", accept(TEXT_EVENT_STREAM), productHandler::getProductEvents)
-			.GET("/products/{id}", accept(APPLICATION_JSON), productHandler::getProduct)
-			.GET("/products", accept(APPLICATION_JSON), productHandler::getAllProducts)
-			.PUT("/products/{id}", accept(APPLICATION_JSON), productHandler::updateProduct)
-			.DELETE("/products/{id}", accept(APPLICATION_JSON), productHandler::deleteProduct)
-			.DELETE("/products", accept(APPLICATION_JSON), productHandler::deleteAllProduct)
+			.path("/products", builder -> builder
+				.nest(accept(APPLICATION_JSON).or(RequestPredicates.contentType(APPLICATION_JSON).or(accept(TEXT_EVENT_STREAM))), nestedBuilder -> nestedBuilder
+					.GET("/event", handler::getProductEvents)
+					.GET("/{id}", handler::getProduct)
+					.GET(handler::getAllProducts)
+					.PUT("/{id}", handler::updateProduct)
+					.POST(handler::saveProduct)
+				)
+				.DELETE("/{id}", handler::deleteProduct)
+				.DELETE(handler::deleteAllProduct)	
+			)
 			.build();
 	}
 

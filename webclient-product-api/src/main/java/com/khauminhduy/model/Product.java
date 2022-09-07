@@ -1,23 +1,17 @@
-package com.khauminhduy.productapiannotation.model;
+package com.khauminhduy.model;
 
 import java.util.Objects;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-@Document
 public class Product {
 
-	@Id
 	private String id;
-
 	private String name;
+	private Double price;
 
-	private double price;
+	public Product() {
+	}
 
-	public Product() {}
-
-	public Product(String id, String name, double price) {
+	public Product(String id, String name, Double price) {
 		this.id = id;
 		this.name = name;
 		this.price = price;
@@ -39,11 +33,11 @@ public class Product {
 		this.name = name;
 	}
 
-	public double getPrice() {
+	public Double getPrice() {
 		return price;
 	}
 
-	public void setPrice(double price) {
+	public void setPrice(Double price) {
 		this.price = price;
 	}
 
@@ -61,8 +55,7 @@ public class Product {
 		if (getClass() != obj.getClass())
 			return false;
 		Product other = (Product) obj;
-		return Objects.equals(id, other.id) && Objects.equals(name, other.name)
-				&& Double.doubleToLongBits(price) == Double.doubleToLongBits(other.price);
+		return Objects.equals(id, other.id) && Objects.equals(name, other.name) && Objects.equals(price, other.price);
 	}
 
 	@Override
